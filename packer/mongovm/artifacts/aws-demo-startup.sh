@@ -5,12 +5,14 @@
 
 drive=$(ls /dev/xvd? | tail -n 1)
 if [ "$drive" = "/dev/xvda" ]; then
-    exit 1
+    sleep 60
+    drive=$(ls /dev/xvd? | tail -n 1)
+    if [ "$drive" = "/dev/xvda" ]; then
+        exit 1
+    fi
 fi
 
-partition="${drive}1"
-
-if ! [ -f $partition ]; then
+if [ "$(file -sL $drive | grep ext4)" = "" ]; then
     mkfs.ext4 $drive
 fi
 
@@ -18,7 +20,8 @@ if ! [ -d /ebs ]; then
     mkdir /ebs
 fi
 
-mount $partition /ebs
+set -e
+mount $drive /ebs
 
 if ! [ -d /ebs/aws-demo-db ]; then
     mkdir /ebs/aws-demo-db

@@ -49,19 +49,31 @@ export AWS_SECRET_ACCESS_KEY=""
 export AWS_REGION=""
 ```
 
-Before running packer or terraform, run `. <(sops -d ./secrets.sh.enc)`
+Before running packer or terraform, run `. <(sops -d ./env.sh.sops)`
 
-### Getting the Stateless VM
+### Stateless MongoDB VM
+
+Isolate the minimum possible amount of stateful-ness. 
+The server itself will be stateless, and only the database files themselves will
+be maintained via an EBS.
+
+#### Create EBS
+
+Note: add volume ID to `env.sh.sops`
 
 #### Packer
 
-1. MVP ()
-
-#### CI/CD for Packer
+1. Confirm Packer function/auth 
+   - `git show bf78f5d19b:packer/mongovm/main.pkr.hcl`
+2. Manually deploy, connect, work through Mongo installation process
+3. Create functioning, stateless VM template (AMI)
+   - `git show 635781d497:packer/mongovm/main.pkr.hcl`
 
 #### Terraform
 
-#### CI/CD for Terraform
+1. Confirm Terraform function/auth
+2. Deploy basic network + a VM from AMI
+   - `git show :terraform/main.tf`
 
 ### Web App 
 
