@@ -1,0 +1,10 @@
+[Unit]
+Description=Ensures Presence of aws-demo DB
+Before=mongod
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/aws-demo-startup.sh
+
+[Install]
+RequiredBy=mongod.service
