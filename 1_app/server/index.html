@@ -17,8 +17,8 @@
       body {
         font-family: "Poppins", sans-serif;
         font-weight: 400;
-        background-color: #262626;
-        color: #e5e7eb;
+        background-color: #ffffff;
+        color: #000000;
         font-size: 16px;
         -ms-text-size-adjust: 100%;
         -webkit-font-smoothing: antialiased;
@@ -31,7 +31,6 @@
       h4,
       h5,
       h6 {
-        color: #fff;
         font-weight: 700;
       }
 
@@ -61,17 +60,22 @@
         flex-direction: row;
         justify-content: left;
         gap: 4rem;
-        height: 30px;
         width: 100%;
-        border-bottom-color: #000;
-        border-bottom-width: 2px;
+        border-bottom: solid 1px black;
         list-style-type: none;
-        margin: 1rem 4rem 5rem;
+        padding: 1rem 5rem;
+        background-color: mediumaquamarine;
       }
 
       #navbar h2 {
-        font-weight: 100;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        font-weight: 300;
         font-size: x-large;
+      }
+
+      #navbar a {
+        color: #000000;
       }
 
       #main-body {
@@ -80,25 +84,42 @@
         margin: 1rem 1rem 10rem;
       }
 
+      table {
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
       tr {
         padding-top: 5px;
+        border: solid 0.5px black
+      }
+
+      th {
+        background-color: lightgray;
       }
 
       th,
       td {
         padding-left: 10px;
         padding-right: 10px;
-        
         word-wrap: normal;
       }
 
       hr {
-        border: solid 1px white;
+        border: solid 1px black;
+        margin-top: 20px;
+        margin-bottom: 20px;
       }
 
       label {
         padding-top: 5px;
         padding-bottom: 5px;
+      }
+
+      button {
+        margin-top: 10px;
+        margin-bottom: 10px;
       }
     </style>
   </head>
@@ -114,8 +135,6 @@
       <h1>Welcome to Pastebin</h1>
       <hr />
       <h2>Current bins:</h2>
-      <p style="font-style:italic">maximum 25 bins</p>
-      <hr />
       <table>
         <tbody>
           <tr>
@@ -125,6 +144,7 @@
           {{.Bins}}
         </tbody>
       </table>
+      <p style="font-style:italic">maximum 25 bins</p>
       <hr />
       <h2>Add a new bin:</h2>
       <form id="newBin">
