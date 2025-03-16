@@ -10,6 +10,8 @@
      - `docker` (building container image for web app)
    - Recommended
      - `docker-compose` (testing web app image locally)
+       - `docker-compose up -d`
+       - `docker-compose down --rmi all -v --remove-orphans`
      - `aws` (troubleshooting)
        - Note: `aws` will be authenticated by the same environment variables
          described below for `tf` and `packer`
@@ -31,6 +33,8 @@
 5. Export `env` variables for auth (`. <(sops -d env.sh.sops)`)
 6. `cd` into `0_mongo-template`, `packer init` and `packer build .`
 7. `cd` into `1_app\tf`, `terraform init` and `terraform apply`
+   - **Note**: change `local.unsafe_app` in `1_vars.tf` to "1", if you want the
+     application to be vulnerable to stored XSS
 8. `cd` into `2_deploy` and `terraform apply`
 9. Profit
 

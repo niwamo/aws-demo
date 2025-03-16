@@ -74,6 +74,10 @@ resource "kubernetes_deployment" "aws-demo-app" {
               }
             }
           }
+          env {
+            name = "DISABLE_HTML_ESCAPE"
+            value = local.unsafe_app
+          }
         }
       }
     }

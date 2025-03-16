@@ -62,6 +62,9 @@ func getRootHandler(client *mongo.Client, tmpl *template.Template) http.HandlerF
 }
 
 func getSubmitHandler(client *mongo.Client) http.HandlerFunc {
+	disableHTMLEscape := os.Getenv("DISABLE_HTML_ESCAPE")
+	log.Printf("DISABLE_HTML_ESCAPE: %s", disableHTMLEscape)
+	
 	return func(response http.ResponseWriter, request *http.Request) {
 		if request.Method != "POST" {
 			log.Printf("Received illegal %s request to /submit", request.Method)
@@ -80,9 +83,14 @@ func getSubmitHandler(client *mongo.Client) http.HandlerFunc {
 			http.Error(response, "Error parsing form", http.StatusBadRequest)
 			return
 		}
+		
+		content := request.FormValue("content")
+		if disableHTMLEscape != "1"	{
+			content = template.HTMLEscapeString(content)
+		}
 		bin := Bin{
 			Title: request.FormValue("title"),
-			Content: request.FormValue("content"),
+			Content: content,
 		}
 
 		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
