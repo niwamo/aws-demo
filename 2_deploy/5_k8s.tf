@@ -99,9 +99,10 @@ resource "kubernetes_service" "aws-demo-app" {
       target_port = 443
     }
     type = "LoadBalancer"
+    load_balancer_class = "eks.amazonaws.com/nlb"
   }
 }
 
-output "lb_ip" {
-  value = kubernetes_service.aws-demo-app.spec
+output "app_endpoint" {
+  value = kubernetes_service.aws-demo-app.status[0].load_balancer[0].ingress[0].hostname
 }

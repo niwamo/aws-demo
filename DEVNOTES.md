@@ -2,9 +2,9 @@
 
 ## Steps
 
-### GitHub Repo
+### Create GitHub Repo
 
-### AWS Account Setup
+### Create AWS Account
 
 1. Create account
 2. Setup MFA on root account
@@ -22,11 +22,14 @@
 
 #### New Age Key + Age Config
 
+[ref](https://nicholas-morris.com/articles/sops)
+
 ```sh
+# generate a new key
 age-keygen
 ```
 
-Add to `~/.config/sops/age/keys.txt`
+Add key to `~/.config/sops/age/keys.txt`
 
 Add new rule to `~/.sops.yaml`
 
@@ -54,18 +57,24 @@ Before running packer or terraform, run `. <(sops -d ./env.sh.sops)`
 ### Stateless MongoDB VM
 
 Isolate the minimum possible amount of stateful-ness. 
-The server itself will be stateless, and only the database files themselves will
+Keep the VM and DB server stateless. Only the database files themselves will
 be maintained via an EBS.
 
 #### Create EBS
 
-Note: add volume ID to `env.sh.sops`
+Note: add volume ID to `env.sh.sops` as `TF_VAR_DB_EBS_ID`
 
 #### Packer
 
 1. Confirm Packer function/auth 
    - `git show bf78f5d19b:packer/mongovm/main.pkr.hcl`
 2. Manually deploy, connect, work through Mongo installation process
+   - `mongod.conf` to listen on all IPs and require auth
+   - systemd unit file to:
+      1. Check for ELB block device; fail if not present
+      2. If present, check for filesystem and DB
+      3. If no filesystem, format and instantiate DB
+   - ensure `mongod` fails if `pre-mongo` is not successful
 3. Create functioning, stateless VM template (AMI)
    - `git show 635781d497:packer/mongovm/main.pkr.hcl`
 
@@ -73,20 +82,29 @@ Note: add volume ID to `env.sh.sops`
 
 1. Confirm Terraform function/auth
 2. Deploy basic network + a VM from AMI
-   - `git show :terraform/main.tf`
+   - `git show 6b47a6e885:terraform/`
 
 ### Web App 
 
-#### Build the app
+#### Proof of Concept
 
-#### Build and Push the container
+1. Use a basic dockerfile + nginx install for an "MVP" web app
+2. Build locally and push to AWS using terraform
+3. Build terraform config for EKS with a publicly exposed deployment
+   - `git show 1dd7a1021b:`
 
-#### Terraform for EKS + App
+#### Actual App
 
-### Backups
+1. Build a PoC golang web app
+2. Use docker-compose to deploy the web app and a stand-in for the Mongo VM 
+3. Build the PoC for connecting web server to golang
+4. Parameterize the DB connection; provide DB string as environment variable
+5. Test the DB connection and ENV approach against the AWS/EKS infra
+6. Complete the app and deploy
+   - `git show 77ab9dcd6e:`
 
-#### S3 Bucket
+### Wrapping Up Requirements
 
-#### Scripts
+#### Backups
 
-### CI/CD
+#### CI/CD Pipelines
