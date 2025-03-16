@@ -9,6 +9,8 @@ import (
 	"strings"
 	"os"
 	"html/template"
+	"regexp"
+	"strconv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -119,6 +121,53 @@ func getSubmitHandler(client *mongo.Client) http.HandlerFunc {
 	}
 }
 
+func getClearHandler(client *mongo.Client) http.HandlerFunc {
+	return func(response http.ResponseWriter, request *http.Request) {
+		if request.Method != "POST" {
+			log.Printf("Received illegal %s request to /submit", request.Method)
+			return
+		}
+		log.Print("Received request to /submit")
+
+		dbName := "aws-demo"
+		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		collections, err := client.Database(dbName).ListCollectionNames(ctx, bson.D{})
+		if err != nil {
+			log.Printf("Error clearing %s", err)
+			http.Error(response, "Error clearing", http.StatusInternalServerError)
+			return
+		}
+
+		re := regexp.MustCompile(`^bkp-(\d+)$`)
+		maxBackup := 0
+
+		for _, name := range collections {
+			matches := re.FindStringSubmatch(name)
+			if len(matches) == 2 {
+				num, err := strconv.Atoi(matches[1])
+				if err == nil && num > maxBackup {
+					maxBackup = num
+				}
+			}
+		}
+
+		oldName := "bins"
+		newName := fmt.Sprintf("bkp-%d", maxBackup+1)
+		cmd := bson.D{{"renameCollection", dbName + "." + oldName}, {"to", dbName + "." + newName}, {"dropTarget", false}}
+		
+		err = client.Database("admin").RunCommand(ctx, cmd).Err()
+		if err != nil {
+			log.Printf("Error clearing %s", err)
+			http.Error(response, "Error clearing", http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Collection '%s' renamed to '%s' successfully.\n", oldName, newName)
+
+		fmt.Fprint(response, "Success")
+	}
+}
+
 func main() {
 	log.Print("Starting server...")
 
@@ -148,6 +197,9 @@ func main() {
 
 	getSubmit := getSubmitHandler(client)
 	http.HandleFunc("/submit", getSubmit)
+
+	getClear := getClearHandler(client)
+	http.HandleFunc("/clear", getClear)
 
 	err = http.ListenAndServeTLS(":443", "/opt/cert.crt", "/opt/cert.key", nil)
 	if err != nil {

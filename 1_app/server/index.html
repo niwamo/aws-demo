@@ -112,6 +112,7 @@
     </ul>
     <div id="main-body">
       <h1>Welcome to Pastebin</h1>
+      <hr />
       <h2>Current bins:</h2>
       <p style="font-style:italic">maximum 25 bins</p>
       <hr />
@@ -167,6 +168,31 @@
             }
           });
       </script>
+      <hr />
+      <h2>Clear all bins:</h2>
+      <form id="clearBins">
+        <button type="submit">Clear</button>
+      </form>
+      <script>
+        document
+          .getElementById("clearBins")
+          .addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent default form submission
+            try {
+              let response = await fetch("/clear", {
+                method: "POST",
+              });
+              if (response.ok) {
+                location.reload(); // Reload page on successful submission
+              } else {
+                alert("Clearing failed!");
+              }
+            } catch (error) {
+              alert("Clearing failed!");
+            }
+          });
+      </script>
+      <hr />
     </div>
     <div id="footer"></div>
   </body>
