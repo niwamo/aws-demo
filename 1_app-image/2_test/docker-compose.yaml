@@ -1,9 +1,0 @@
-services:
-  mongo:
-    image: db:latest
-  server:
-    image: server:latest
-    ports:
-      - 8443:443
-    environment:
-      DB_CONN_STRING: mongodb://aws-demo:aws-demo@mongo:27017/aws-demo?retryWrites=true&w=majority
