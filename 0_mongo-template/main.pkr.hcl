@@ -7,15 +7,18 @@ packer {
   }
 }
 
+variable "region" {
+  default = env("AWS_REGION")
+}
+
 source "amazon-ebs" "build" {
   ami_name              = "aws-demo_mongovm"
   force_deregister      = true
   force_delete_snapshot = true
   instance_type         = "t2.micro"
-  region                = env("AWS_REGION")
-  # https://cloud-images.ubuntu.com/locator/ec2/
-  source_ami   = "ami-05803413c51f242b7"
-  ssh_username = "ubuntu"
+  region                = var.region
+  source_ami            = lookup(var.sourceAMIs, var.region, "")
+  ssh_username          = "ubuntu"
 }
 
 build {
