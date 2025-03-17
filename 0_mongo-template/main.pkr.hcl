@@ -12,7 +12,7 @@ source "amazon-ebs" "build" {
   force_deregister      = true
   force_delete_snapshot = true
   instance_type         = "t2.micro"
-  region                = "us-east-2"
+  region                = env("AWS_REGION")
   # https://cloud-images.ubuntu.com/locator/ec2/
   source_ami   = "ami-05803413c51f242b7"
   ssh_username = "ubuntu"
