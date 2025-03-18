@@ -171,13 +171,17 @@
             event.preventDefault(); // Prevent default form submission
             let formData = new FormData(this);
             try {
+              const controller = new AbortController();
+              const id = setTimeout(() => controller.abort(), 2000)
               let response = await fetch("/submit", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams(formData).toString(),
+                signal: controller.signal
               });
+              clearTimeout(id);
               if (response.ok) {
                 location.reload(); // Reload page on successful submission
               } else {
@@ -199,9 +203,13 @@
           .addEventListener("submit", async function (event) {
             event.preventDefault(); // Prevent default form submission
             try {
+              const controller = new AbortController();
+              const id = setTimeout(() => controller.abort(), 2000)
               let response = await fetch("/clear", {
                 method: "POST",
+                signal: controller.signal
               });
+              clearTimeout(id);
               if (response.ok) {
                 location.reload(); // Reload page on successful submission
               } else {

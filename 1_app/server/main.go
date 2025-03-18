@@ -31,29 +31,31 @@ func getRootHandler(client *mongo.Client, tmpl *template.Template) http.HandlerF
 		
 		collection := client.Database("aws-demo").Collection("bins")
 
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 		cursor, err := collection.Find(ctx, bson.D{})
+		var data map[string]template.HTML
 		if err != nil {
-			log.Fatal(err)
-		}
-		defer cursor.Close(ctx)
-
-		var results []string
-
-		for cursor.Next(ctx) {
-			var bin Bin
-			if err := cursor.Decode(&bin); err != nil {
-				log.Fatal(err)
+			log.Print(err)
+			data = map[string]template.HTML{
+				"Bins": template.HTML("<tr><td>Error</td><td>Retrieving bins</td></tr>"),
 			}
-			row := fmt.Sprintf("<tr><td>%s</td><td>%s</td>", bin.Title, bin.Content)
-			results = append(results, row)
+		} else {
+			defer cursor.Close(ctx)
+			var results []string
+			for cursor.Next(ctx) {
+				var bin Bin
+				if err := cursor.Decode(&bin); err != nil {
+					log.Fatal(err)
+				}
+				row := fmt.Sprintf("<tr><td>%s</td><td>%s</td>", bin.Title, bin.Content)
+				results = append(results, row)
+			}
+			result := strings.Join(results, "\n")
+			data = map[string]template.HTML{
+				"Bins": template.HTML(result),
+			}
 		}
-
-		result := strings.Join(results, "\n")
-
-		data := map[string]template.HTML{
-			"Bins": template.HTML(result),
-		}
+		
 		err = tmpl.Execute(response, data)
 
 		if err != nil {
@@ -95,7 +97,7 @@ func getSubmitHandler(client *mongo.Client) http.HandlerFunc {
 			Content: content,
 		}
 
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 		collection := client.Database("aws-demo").Collection("bins")
 
 		opts := options.Count().SetHint("_id_")
@@ -130,7 +132,7 @@ func getClearHandler(client *mongo.Client) http.HandlerFunc {
 		log.Print("Received request to /submit")
 
 		dbName := "aws-demo"
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 		collections, err := client.Database(dbName).ListCollectionNames(ctx, bson.D{})
 		if err != nil {
 			log.Printf("Error clearing %s", err)
@@ -168,6 +170,18 @@ func getClearHandler(client *mongo.Client) http.HandlerFunc {
 	}
 }
 
+func dbErrorServer() {
+	log.Print("Running db error server")
+	getRoot := func(response http.ResponseWriter, request *http.Request) {
+		http.Error(response, "Database error", http.StatusInternalServerError)
+	}
+	http.HandleFunc("/", getRoot)
+	err := http.ListenAndServeTLS(":443", "/opt/cert.crt", "/opt/cert.key", nil)
+	if err != nil {
+		log.Print(err)
+	}
+}
+
 func main() {
 	log.Print("Starting server...")
 
@@ -176,13 +190,17 @@ func main() {
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		dbErrorServer()
+		return
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		dbErrorServer()
+		return
 	}
 	defer client.Disconnect(ctx)
 	log.Print("Connected to database")
@@ -203,7 +221,7 @@ func main() {
 
 	err = http.ListenAndServeTLS(":443", "/opt/cert.crt", "/opt/cert.key", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	log.Print("Exiting.")
