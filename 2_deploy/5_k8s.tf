@@ -75,7 +75,7 @@ resource "kubernetes_deployment" "aws-demo-app" {
             }
           }
           env {
-            name = "DISABLE_HTML_ESCAPE"
+            name  = "DISABLE_HTML_ESCAPE"
             value = local.unsafe_app
           }
         }
@@ -102,7 +102,7 @@ resource "kubernetes_service" "aws-demo-app" {
       port        = 443
       target_port = 443
     }
-    type = "LoadBalancer"
+    type                = "LoadBalancer"
     load_balancer_class = "eks.amazonaws.com/nlb"
   }
 }
