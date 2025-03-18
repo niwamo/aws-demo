@@ -21,6 +21,9 @@ resource "aws_eks_cluster" "app" {
     ]
   }
 
+  # Limit change between environments
+  version = "1.32"
+
   # optional: required for EKS Auto Mode
   bootstrap_self_managed_addons = false
   access_config {
