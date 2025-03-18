@@ -64,7 +64,6 @@ Once the basic config is complete:
 export AWS_ACCESS_KEY_ID=""
 export AWS_SECRET_ACCESS_KEY=""
 export AWS_REGION=""
-export TF_VAR_AWS_REGION=${AWS_REGION}
 export TF_VAR_DB_EBS_ID=""
 ```
 
