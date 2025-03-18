@@ -195,7 +195,7 @@ func main() {
 		return
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Print(err)
@@ -203,7 +203,13 @@ func main() {
 		return
 	}
 	defer client.Disconnect(ctx)
-	log.Print("Connected to database")
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Printf("Error pinging database: %s", err)
+	} else {
+		log.Print("Connected to database")
+	}
 
 	rootTemplate, err := template.ParseFiles("/opt/index.html")
 	if err != nil {
