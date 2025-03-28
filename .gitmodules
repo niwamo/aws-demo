@@ -1,0 +1,3 @@
+[submodule "1_app"]
+	path = 1_app
+	url = https://github.com/niwamo/pastebin
