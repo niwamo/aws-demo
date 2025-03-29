@@ -15,6 +15,10 @@ resource "aws_eks_cluster" "app" {
   role_arn = aws_iam_role.cluster.arn
   vpc_config {
     endpoint_public_access = true
+    public_access_cidrs = [
+      local.allowed_IPs_for_admin,
+      "${aws_nat_gateway.ngw.public_ip}/32"
+    ]
     subnet_ids = [
       aws_subnet.private1.id,
       aws_subnet.private2.id

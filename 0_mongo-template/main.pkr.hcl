@@ -26,28 +26,12 @@ build {
     "source.amazon-ebs.build"
   ]
   provisioner "file" {
-    source      = "./artifacts/mongod.conf"
-    destination = "/tmp/mongod.conf"
-  }
-  provisioner "file" {
-    source      = "./artifacts/pre-mongo.service"
-    destination = "/tmp/pre-mongo.service"
-  }
-  provisioner "file" {
-    source      = "./artifacts/override.conf"
-    destination = "/tmp/override.conf"
-  }
-  provisioner "file" {
-    source      = "./artifacts/aws-demo-startup.sh"
-    destination = "/tmp/aws-demo-startup.sh"
-  }
-  provisioner "shell" {
-    scripts = [
-      "./artifacts/install-mongo.sh"
-    ]
+    source      = "./artifacts/"
+    destination = "/tmp/"
   }
   provisioner "shell" {
     inline = [
+      "sudo dos2unix /tmp/*", # just in case
       "sudo mv /tmp/mongod.conf /etc/mongod.conf",
       "sudo mv /tmp/pre-mongo.service /lib/systemd/system/pre-mongo.service",
       "sudo mkdir /etc/systemd/system/mongod.service.d",

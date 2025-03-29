@@ -1,10 +1,6 @@
-# Local .terraform directories
+# tf
 **/.terraform/*
-
-# .tfstate files
-*.tfstate
-*.tfstate.*
-
-# Ignore transient lock info files created by terraform apply
-.terraform.tfstate.lock.info
+*.tfstate*
 .terraform*
+
+.prettierrc.json
