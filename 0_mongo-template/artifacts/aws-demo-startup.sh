@@ -26,7 +26,7 @@ mount $drive /ebs
 if ! [ -d /ebs/aws-demo-db ]; then
     mkdir /ebs/aws-demo-db
     mongod --dbpath /ebs/aws-demo-db --fork --logpath /dev/null
-    mongo aws-demo --eval "db.createUser({user:'aws-demo',pwd:'aws-demo',roles:['dbOwner']}); db.docs.insert({init:'init'})"
+    mongo pastebin --eval "db.createUser({user:'aws-demo',pwd:'aws-demo',roles:['dbOwner']}); db['active-bins'].insert({ timestamp: 1743704875, title: 'firstBin', content: 'firstBinContents' })"
     mongod --dbpath /ebs/aws-demo-db --shutdown
     sleep 1
 fi

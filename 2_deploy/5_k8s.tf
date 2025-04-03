@@ -31,7 +31,7 @@ resource "kubernetes_secret" "dbstring" {
     name = "dbstring"
   }
   data = {
-    DB_CONN_STRING = "mongodb://aws-demo:aws-demo@${aws_instance.mongo-server.private_ip}:27017/aws-demo?retryWrites=true&w=majority"
+    DB_CONN_STRING = "mongodb://aws-demo:aws-demo@${aws_instance.mongo-server.private_ip}:27017/pastebin"
   }
 }
 
